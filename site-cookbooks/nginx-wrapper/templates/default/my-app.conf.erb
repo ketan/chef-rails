@@ -1,0 +1,20 @@
+server {
+  listen       <%= node['nginx']['port'] -%>;
+  server_name  <%= node['hostname'] %>;
+
+  root         /webapps/my-app/public;
+
+  passenger_ruby <%= ::File.join(node['rvm']['root_path'], 'wrapper', "#{node['nginx-wrapper']['my-app']['ruby-version']}@#{node['nginx-wrapper']['my-app']['gemset-name']}", 'bin', 'ruby') %>;
+  passenger_enabled on;
+
+  # set long lived headers on assets
+  location ~ "^/assets/(.*/)*.*-[0-9a-f]{32}.*" {
+    gzip_static on;
+    expires     max;
+    etag        off;
+    add_header  Cache-Control public;
+  }
+
+  access_log  <%= node['nginx']['log_dir'] %>/<%= node['hostname'] %>.access.log;
+  error_log   <%= node['nginx']['log_dir'] %>/<%= node['hostname'] %>.error.log;
+}

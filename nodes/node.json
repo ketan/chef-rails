@@ -1,0 +1,70 @@
+{
+  "run_list": [
+    "recipe[apt]",
+    "recipe[sudo]",
+    "recipe[hostnames]",
+    "recipe[fail2ban]",
+    "recipe[ssh-hardening]",
+    "recipe[dpkg_packages]",
+    "recipe[timezone-ii]",
+    "recipe[postgresql::server]",
+    "recipe[postgresql::contrib]",
+    "recipe[postgresql::libpq]",
+    "recipe[redis::server]",
+    "recipe[memcached]",
+    "recipe[nginx-wrapper]"
+  ],
+
+  "nginx": {
+    "package_name": "nginx-extras",
+    "repo_source": "passenger",
+    "default_site_enabled" : false,
+    "passenger": {
+      "install_method": "package"
+    }
+  },
+
+  "authorization": {
+    "sudo": {
+      "groups"      : ["sudo", "admin"],
+      "users"       : ["deploy", "vagrant", "ubuntu"],
+      "passwordless": true
+    }
+  },
+
+  "ssh": {
+    "use_pam": true
+  },
+
+  /*"set_fqdn": "vagrant.example.com",*/
+
+  "dpkg_packages": {
+    "pkgs": {
+      "tzdata"     : { "action": "upgrade" },
+      "nodejs" : { "action": "install" },
+      "imagemagick": { "action": "install" },
+      "htop"       : { "action": "install" }
+    }
+  },
+
+  "tz": "America/Santiago",
+
+  "postgresql": {
+    "shared_buffers": "256MB",
+    "shared_preload_libraries": "pg_stat_statements",
+    "users": [
+      {
+        "username": "deploy",
+        "password": "123456",
+        "superuser": true,
+        "login": true
+      }
+    ]
+  },
+
+  "fail2ban": {
+    "bantime" : 600,
+    "maxretry": 3,
+    "backend" : "auto"
+  }
+}
